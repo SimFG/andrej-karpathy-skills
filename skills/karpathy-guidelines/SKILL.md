@@ -1,6 +1,6 @@
 ---
 name: karpathy-guidelines
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
+description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, define verifiable success criteria, communicate progress clearly, and prevent document sprawl. Apply these guidelines whenever generating, editing, or reviewing code — especially for non-trivial tasks involving multiple files, refactoring, or ambiguous requirements.
 license: MIT
 ---
 
@@ -9,6 +9,8 @@ license: MIT
 Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+For detailed before/after code examples of each principle, read `references/EXAMPLES.md`.
 
 ## 1. Think Before Coding
 
@@ -29,6 +31,8 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
+
+This applies equally to LLM/AI application code: a single API call does not need a framework wrapper. Use the SDK directly; add LangChain or similar only when you actually need complex chains, vector stores, or built-in retry logic.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
@@ -65,3 +69,41 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## 5. Documents over Documentation
+
+**One document, one truth. No meta-docs.**
+
+Don't create documents to explain other documents. Edit the source instead.
+
+- Summary of existing doc? → Add a "Summary" section at the top of the existing doc.
+- Explanation of changes? → Edit the original with inline context.
+- Alternative options? → Archive in a `research/` subfolder, not the main directory.
+- Questions & answers? → Edit the spec directly; clarify in place.
+- Process artifacts? → Delete after the task completes; don't archive as "record-keeping".
+
+Ask yourself: "Does this document exist ONLY to explain or summarize another document?" If yes, delete it and fix the original instead.
+
+## 6. Communicate Progress
+
+**Narrate what you are doing, not what you did.**
+
+For multi-step tasks:
+- Announce the current step *before* starting it, not after.
+- Confirm completion of each step in one line.
+- Flag unexpected findings immediately — don't silently adapt and continue.
+
+```
+Step 1/3: Adding validation to src/auth.ts → verify: function accepts empty input
+✓ Done. Step 2/3: Writing failing test → verify: test fails before fix
+✓ Done. Step 3/3: Making test pass → verify: test suite green
+```
+
+Bad: Silently editing 12 files, then a final summary.
+Good: One line before and after each step so the user can interrupt if the plan is wrong.
+
+Keep narration minimal — one line per step is enough. No essays.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, clarifying questions come before implementation rather than after mistakes, and no proliferation of meta-documents.
